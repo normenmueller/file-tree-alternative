@@ -11,6 +11,7 @@
 - `./intg` → Integration worktree (branch `intg`).
 - `./drft/{feat, fix, ...}-<feature>` → Draft worktrees (not published).
 - `./preq/{feat, fix, ...}-<feature>` → PR worktrees (published PRs).
+- Branch names may use `{feat, fix, ...}/<feature>` while worktree directories use `{feat, fix, ...}-<feature>` (replace `/` with `-`).
 - Worktrees must live **only** under `./drft` or `./preq`; keep `./intg` clean (no worktrees inside `./intg`).
 
 ## Engineering Expectations
@@ -48,8 +49,8 @@
 
 ```
 git -C ./intg fetch upstream
-git -C ./intg branch {feat, fix, ...}-<feature> upstream/main
-git -C ./intg worktree add ./drft/{feat, fix, ...}-<feature> {feat, fix, ...}-<feature>
+git -C ./intg branch {feat, fix, ...}/<feature> upstream/main
+git -C ./intg worktree add ./drft/{feat, fix, ...}-<feature> {feat, fix, ...}/<feature>
 ```
 
 ### 4) Publishing a PR
