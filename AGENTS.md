@@ -114,6 +114,8 @@ git -C ./intg merge --no-ff origin/<feature-branch>
 ### 8) Push Policy
 
 - **Never push** any branch until explicitly approved.
+- **Never push** from `intg` to `upstream/main`; `intg` is the integration branch.
+- PRs are opened **only** from `./preq/*` worktrees.
 - Before any push, ensure the branch **compiles** and the **relevant tests pass** (only the tests affected by the change set).
 - For open PR branches, no history rewrites unless explicitly requested.
 
