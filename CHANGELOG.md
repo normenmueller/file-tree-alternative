@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## 2026-01-07 — docs-agents-intg-direct
+
+### Allow direct AGENTS updates in intg
+
+Clarifies that AGENTS.md changes are made directly in `intg` without creating branches, while keeping the default workflow for other changes.
+
+Changelog:
+- Allow direct AGENTS.md updates in `intg`
+
+Tests:
+- Not run (documentation-only change)
+
 ## 2026-01-07 — docs-intg-push-policy
 
 ### Clarify intg push policy
