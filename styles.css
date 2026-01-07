@@ -282,7 +282,8 @@ div.workspace-leaf-content[data-type='file-tree-view'] > div.view-content {
 
 .drag-entered,
 .oz-folder-element:hover,
-.oz-nav-file:hover {
+.oz-nav-file:hover,
+.oz-folder-element.is-folder-active-row {
     background-color: var(--background-secondary-alt);
     color: var(--text-normal);
 }
