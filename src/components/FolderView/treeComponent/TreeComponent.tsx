@@ -150,7 +150,7 @@ export default function Tree(props: TreeProps) {
                         onDragLeave={() => setHightlight(false)}>
                         <div
                             {...getRootProps({ className: 'dropzone' })}
-                            className={'oz-folder-element' + (highlight ? ' drag-entered' : '')}
+                            className={'oz-folder-element' + (highlight ? ' drag-entered' : '') + (isFolderActive ? ' is-folder-active-row' : '')}
                             data-path={props.folder.path}>
                             <input {...getInputProps()} />
 

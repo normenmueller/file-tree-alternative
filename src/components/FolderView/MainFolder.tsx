@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo, useRef } from 'react';
 import Tree from 'components/FolderView/treeComponent/TreeComponent';
 import FileTreeAlternativePlugin from 'main';
 import ConditionalRootFolderWrapper from 'components/FolderView/ConditionalWrapper';
@@ -23,10 +23,13 @@ export function MainFolder(props: FolderProps) {
     const rootFolder = app.vault.getRoot();
 
     // Global States
-    const [_activeFolderPath, setActiveFolderPath] = useRecoilState(recoilState.activeFolderPath);
+    const [activeFolderPath, setActiveFolderPath] = useRecoilState(recoilState.activeFolderPath);
     const [folderTree] = useRecoilState(recoilState.folderTree);
     const [focusedFolder, setFocusedFolder] = useRecoilState(recoilState.focusedFolder);
-    const [_openFolders, setOpenFolders] = useRecoilState(recoilState.openFolders);
+    const [openFolders, setOpenFolders] = useRecoilState(recoilState.openFolders);
+    const [folderFileCountMap] = useRecoilState(recoilState.folderFileCountMap);
+
+    const folderPaneRef = useRef<HTMLDivElement>(null);
 
     // Force Update
     const forceUpdate = useForceUpdate();
@@ -136,10 +139,134 @@ export function MainFolder(props: FolderProps) {
         if (!folder.isRoot()) focusOnFolder(folder.parent);
     };
 
+    const getSortedFolderTree = (tree: FolderTree[]) => {
+        let newTree = tree;
+        newTree = newTree.sort((a, b) => {
+            if (plugin.settings.sortFoldersBy === 'name') {
+                return a.folder.name.localeCompare(b.folder.name, 'en', { numeric: true });
+            } else if (plugin.settings.sortFoldersBy === 'item-number') {
+                let aCount = folderFileCountMap[a.folder.path] ? folderFileCountMap[a.folder.path].closed : 0;
+                let bCount = folderFileCountMap[b.folder.path] ? folderFileCountMap[b.folder.path].closed : 0;
+                return bCount - aCount;
+            }
+        });
+        return newTree;
+    };
+
+    const folderTreeMap = useMemo(() => {
+        const map = new Map<string, FolderTree>();
+        if (!folderTree) return map;
+        const walk = (node: FolderTree) => {
+            map.set(node.folder.path, node);
+            if (node.children) {
+                for (let child of node.children) {
+                    walk(child);
+                }
+            }
+        };
+        walk(folderTree);
+        return map;
+    }, [folderTree]);
+
+    const visibleFolders = useMemo(() => {
+        if (!folderTree) return [];
+        let result: TFolder[] = [];
+        const walkChildren = (children: FolderTree[]) => {
+            const sorted = getSortedFolderTree(children);
+            for (let child of sorted) {
+                result.push(child.folder);
+                if (openFolders.contains(child.folder.path)) {
+                    walkChildren(child.children);
+                }
+            }
+        };
+        result.push(folderTree.folder);
+        walkChildren(folderTree.children);
+        return result;
+    }, [folderTree, openFolders, plugin.settings.sortFoldersBy, folderFileCountMap]);
+
+    const scrollToFolder = (folder: TFolder) => {
+        const selector = `div.oz-folder-contents div.oz-folder-element[data-path="${folder.path}"]`;
+        const folderElement = document.querySelector(selector);
+        if (folderElement) folderElement.scrollIntoView({ block: 'nearest' });
+    };
+
+    const focusFolderPane = () => folderPaneRef.current?.focus();
+
+    const isEditableTarget = (target: EventTarget | null) => {
+        const element = target as HTMLElement | null;
+        if (!element) return false;
+        return Boolean(element.closest('input, textarea, select, [contenteditable="true"], [contenteditable=""]'));
+    };
+
+    const setActiveAndScroll = (folder: TFolder) => {
+        setActiveFolderPath(folder.path);
+        scrollToFolder(folder);
+    };
+
+    const handleFolderPaneKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+        if (!['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].contains(e.key)) return;
+        if (isEditableTarget(e.target)) return;
+        if (!folderTree || visibleFolders.length === 0) return;
+        e.preventDefault();
+        e.stopPropagation();
+
+        const currentPath = activeFolderPath || focusedFolder?.path || folderTree.folder.path;
+        let currentIndex = visibleFolders.findIndex((folder) => folder.path === currentPath);
+        if (currentIndex < 0) currentIndex = 0;
+        const currentFolder = visibleFolders[currentIndex];
+
+        if (e.key === 'ArrowUp') {
+            if (currentIndex > 0) setActiveAndScroll(visibleFolders[currentIndex - 1]);
+            return;
+        }
+
+        if (e.key === 'ArrowDown') {
+            if (currentIndex < visibleFolders.length - 1) setActiveAndScroll(visibleFolders[currentIndex + 1]);
+            return;
+        }
+
+        if (e.key === 'ArrowLeft') {
+            const isOpen = openFolders.contains(currentFolder.path);
+            if (isOpen) {
+                const newOpenFolders = openFolders.filter((openFolder) => openFolder !== currentFolder.path);
+                setOpenFolders(newOpenFolders);
+                return;
+            }
+
+            const parent = currentFolder.parent;
+            if (parent) {
+                if (focusedFolder && currentFolder.path === focusedFolder.path && !focusedFolder.isRoot()) {
+                    focusOnFolder(parent);
+                    window.setTimeout(() => scrollToFolder(parent), 0);
+                } else {
+                    setActiveAndScroll(parent);
+                }
+            }
+            return;
+        }
+
+        if (e.key === 'ArrowRight') {
+            const treeNode = folderTreeMap.get(currentFolder.path);
+            const children = treeNode?.children ?? [];
+            if (children.length === 0) return;
+
+            const isOpen = openFolders.contains(currentFolder.path);
+            if (!isOpen && currentFolder.path !== focusedFolder?.path) {
+                setOpenFolders([...openFolders, currentFolder.path]);
+                return;
+            }
+
+            const sortedChildren = getSortedFolderTree(children);
+            const firstChild = sortedChildren[0]?.folder;
+            if (firstChild) setActiveAndScroll(firstChild);
+        }
+    };
+
     let folderActionItemSize = 22;
 
     return (
-        <div className="oz-folders-tree-wrapper">
+        <div className="oz-folders-tree-wrapper" ref={folderPaneRef} tabIndex={0} onMouseDown={focusFolderPane} onKeyDown={handleFolderPaneKeyDown}>
             <div className="oz-folders-action-items file-tree-header-fixed">
                 <Icons.MdOutlineCreateNewFolder
                     className="oz-nav-action-button"

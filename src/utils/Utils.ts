@@ -174,12 +174,12 @@ export const createNewFile = async (e: React.MouseEvent | null, folderPath: stri
     modal.open();
 };
 
-export const getBookmarksPluginItems = (): BookmarksPluginItem[] => {
+export const getBookmarksPluginItems = (app: App): BookmarksPluginItem[] => {
     return (app as any).internalPlugins.plugins['bookmarks'].instance.items as BookmarksPluginItem[];
 };
 
-export const getBookmarkTitle = (title: string): BookmarksPluginItem => {
-    let bookmarkItems = getBookmarksPluginItems();
+export const getBookmarkTitle = (title: string, app: App): BookmarksPluginItem => {
+    let bookmarkItems = getBookmarksPluginItems(app);
     let titleParts = title.split('/');
     let currentItem: BookmarksPluginItem = bookmarkItems.find((b) => b.title === titleParts[0]);
     for (let i = 1; i < titleParts.length; i++) {
