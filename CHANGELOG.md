@@ -1,5 +1,18 @@
 # CHANGELOG
 
+## 2026-01-07 — feat-nav-by-arr-key
+
+### Add arrow-key navigation for folder pane
+
+Implements keyboard navigation in the folder pane only: up/down moves between visible folders, left closes or moves to parent, and right opens or moves to the first child. The active folder row now also shows the hover background.
+
+Changelog:
+- Add folder-pane keydown handling and visible-folder traversal
+- Highlight the active folder row with the hover background
+
+Tests:
+- Manual: `./fkupd.sh drft/feat-nav-by-arr-key` (user-verified)
+
 ## 2026-01-07 — docs-agents-intg-direct
 
 ### Allow direct AGENTS updates in intg
