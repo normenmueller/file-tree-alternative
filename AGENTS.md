@@ -32,7 +32,8 @@
 
 - Default: work **only** in `./drft/...`.
 - Exception: fixing an **already published PR** → work directly in the matching `./preq/...`.
-- Never develop in `./intg` or `./main`.
+- Exception: changes to `AGENTS.md` are made directly in `./intg`; no branch is required.
+- Never develop in `./intg` or `./main` (except for direct `AGENTS.md` updates).
 
 ### 2) Checkpoint Tags (Mandatory)
 
