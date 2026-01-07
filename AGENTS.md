@@ -11,6 +11,7 @@
 - `./intg` → Integration worktree (branch `intg`).
 - `./drft/{feat, fix, ...}-<feature>` → Draft worktrees (not published).
 - `./preq/{feat, fix, ...}-<feature>` → PR worktrees (published PRs).
+- Worktrees must live **only** under `./drft` or `./preq`; keep `./intg` clean (no worktrees inside `./intg`).
 
 ## Engineering Expectations
 
@@ -123,7 +124,9 @@ git -C ./intg merge --no-ff origin/<feature-branch>
 ### 9) Testing (Required when tests are added)
 
 - If a change adds or modifies tests, **run the relevant tests**.
+- Before a branch is **ready to commit**, always run the **build** and the **relevant tests** (if any exist).
 - **User runs `npm install`**. Do not run it unless explicitly requested.
+- If build/tests are required in a new worktree and `node_modules/` is missing, ask the user to run `npm install` before proceeding.
 - **Fresh branch/worktree rule**: before running any tests in a newly created worktree, verify `node_modules/` exists. If it does not, ask the user to run `npm install` and wait for confirmation before executing tests.
 - For UI‑only changes where automated tests are not applicable:
   - Perform manual verification.
