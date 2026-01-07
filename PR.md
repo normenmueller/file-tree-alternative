@@ -1,6 +1,6 @@
-# feat-nav-by-arr-key
+# feat/nav-by-arr-key
 
-https://github.com/normenmueller/file-tree-alternative/tree/feat-nav-by-arr-key
+https://github.com/normenmueller/file-tree-alternative/tree/feat/nav-by-arr-key
 
 ## Add arrow-key navigation for folder pane
 
