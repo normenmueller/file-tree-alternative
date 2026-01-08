@@ -15,6 +15,7 @@ Examples (illustrative):
 
 - Add folder-pane keydown handling and visible-folder traversal
 - Highlight the active folder row with the hover background
+- Keep keyboard focus on the folder pane during navigation
 
 ## Tests
 
