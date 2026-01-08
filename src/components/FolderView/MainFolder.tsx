@@ -196,8 +196,13 @@ export function MainFolder(props: FolderProps) {
     const isEditableTarget = (target: EventTarget | null) => {
         const element = target as HTMLElement | null;
         if (!element) return false;
-        return Boolean(element.closest('input, textarea, select, [contenteditable="true"], [contenteditable=""]'));
+        const editable = element.closest('input, textarea, select, [contenteditable="true"], [contenteditable=""]') as HTMLElement | null;
+        if (!editable) return false;
+        if (editable.tagName === 'INPUT' && (editable as HTMLInputElement).type === 'file') return false;
+        return true;
     };
+
+    const restoreFocus = () => window.setTimeout(() => focusFolderPane(), 0);
 
     const setActiveAndScroll = (folder: TFolder) => {
         setActiveFolderPath(folder.path);
@@ -218,11 +223,13 @@ export function MainFolder(props: FolderProps) {
 
         if (e.key === 'ArrowUp') {
             if (currentIndex > 0) setActiveAndScroll(visibleFolders[currentIndex - 1]);
+            restoreFocus();
             return;
         }
 
         if (e.key === 'ArrowDown') {
             if (currentIndex < visibleFolders.length - 1) setActiveAndScroll(visibleFolders[currentIndex + 1]);
+            restoreFocus();
             return;
         }
 
@@ -231,6 +238,7 @@ export function MainFolder(props: FolderProps) {
             if (isOpen) {
                 const newOpenFolders = openFolders.filter((openFolder) => openFolder !== currentFolder.path);
                 setOpenFolders(newOpenFolders);
+                restoreFocus();
                 return;
             }
 
@@ -243,6 +251,7 @@ export function MainFolder(props: FolderProps) {
                     setActiveAndScroll(parent);
                 }
             }
+            restoreFocus();
             return;
         }
 
@@ -254,12 +263,14 @@ export function MainFolder(props: FolderProps) {
             const isOpen = openFolders.contains(currentFolder.path);
             if (!isOpen && currentFolder.path !== focusedFolder?.path) {
                 setOpenFolders([...openFolders, currentFolder.path]);
+                restoreFocus();
                 return;
             }
 
             const sortedChildren = getSortedFolderTree(children);
             const firstChild = sortedChildren[0]?.folder;
             if (firstChild) setActiveAndScroll(firstChild);
+            restoreFocus();
         }
     };
 
