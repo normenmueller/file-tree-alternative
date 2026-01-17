@@ -26,6 +26,7 @@ Changelog:
 - Add folder-pane keydown handling and visible-folder traversal
 - Highlight the active folder row with the hover background
 - Keep keyboard focus on the folder pane during navigation
+- Ensure horizontal scroll follows the active folder during keyboard navigation
 
 Tests:
 - Manual: `./fkupd.sh drft/feat-nav-by-arr-key` (user-verified)
