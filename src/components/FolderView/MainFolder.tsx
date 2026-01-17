@@ -187,8 +187,22 @@ export function MainFolder(props: FolderProps) {
 
     const scrollToFolder = (folder: TFolder) => {
         const selector = `div.oz-folder-contents div.oz-folder-element[data-path="${folder.path}"]`;
-        const folderElement = document.querySelector(selector);
-        if (folderElement) folderElement.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+        const folderElement = document.querySelector(selector) as HTMLElement | null;
+        if (!folderElement) return;
+
+        folderElement.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+
+        const scrollContainer = folderPaneRef.current;
+        if (!scrollContainer) return;
+        const containerRect = scrollContainer.getBoundingClientRect();
+        const elementRect = folderElement.getBoundingClientRect();
+        const leftOverflow = elementRect.left - containerRect.left;
+        const rightOverflow = elementRect.right - containerRect.right;
+        if (leftOverflow < 0) {
+            scrollContainer.scrollLeft += leftOverflow;
+        } else if (rightOverflow > 0) {
+            scrollContainer.scrollLeft += rightOverflow;
+        }
     };
 
     const focusFolderPane = () => folderPaneRef.current?.focus();

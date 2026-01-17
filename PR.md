@@ -17,6 +17,7 @@ Examples (illustrative):
 - Highlight the active folder row with the hover background
 - Keep keyboard focus on the folder pane during navigation
 - Ensure horizontal scroll follows the active folder during keyboard navigation
+- Align horizontal scroll position in the folder pane to keep the active row visible
 
 ## Tests
 
