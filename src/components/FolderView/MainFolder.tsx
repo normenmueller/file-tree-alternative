@@ -188,20 +188,35 @@ export function MainFolder(props: FolderProps) {
     const scrollToFolder = (folder: TFolder) => {
         const selector = `div.oz-folder-contents div.oz-folder-element[data-path="${folder.path}"]`;
         const folderElement = document.querySelector(selector) as HTMLElement | null;
-        if (!folderElement) return;
-
-        folderElement.scrollIntoView({ block: 'nearest', inline: 'nearest' });
-
         const scrollContainer = folderPaneRef.current;
-        if (!scrollContainer) return;
+        if (!folderElement || !scrollContainer) return;
+
+        const header = scrollContainer.querySelector('.oz-folders-action-items') as HTMLElement | null;
+        const headerOffset = header ? header.offsetHeight : 0;
+
         const containerRect = scrollContainer.getBoundingClientRect();
         const elementRect = folderElement.getBoundingClientRect();
-        const leftOverflow = elementRect.left - containerRect.left;
-        const rightOverflow = elementRect.right - containerRect.right;
-        if (leftOverflow < 0) {
-            scrollContainer.scrollLeft += leftOverflow;
-        } else if (rightOverflow > 0) {
-            scrollContainer.scrollLeft += rightOverflow;
+
+        const elementTop = elementRect.top - containerRect.top + scrollContainer.scrollTop;
+        const elementBottom = elementTop + elementRect.height;
+        const elementLeft = elementRect.left - containerRect.left + scrollContainer.scrollLeft;
+        const elementRight = elementLeft + elementRect.width;
+
+        const visibleTop = scrollContainer.scrollTop + headerOffset;
+        const visibleBottom = scrollContainer.scrollTop + scrollContainer.clientHeight;
+        const visibleLeft = scrollContainer.scrollLeft;
+        const visibleRight = scrollContainer.scrollLeft + scrollContainer.clientWidth;
+
+        if (elementTop < visibleTop) {
+            scrollContainer.scrollTop = Math.max(0, elementTop - headerOffset);
+        } else if (elementBottom > visibleBottom) {
+            scrollContainer.scrollTop = Math.max(0, elementBottom - scrollContainer.clientHeight);
+        }
+
+        if (elementLeft < visibleLeft) {
+            scrollContainer.scrollLeft = Math.max(0, elementLeft);
+        } else if (elementRight > visibleRight) {
+            scrollContainer.scrollLeft = Math.max(0, elementRight - scrollContainer.clientWidth);
         }
     };
 

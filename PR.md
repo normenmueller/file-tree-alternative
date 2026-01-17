@@ -18,6 +18,7 @@ Examples (illustrative):
 - Keep keyboard focus on the folder pane during navigation
 - Ensure horizontal scroll follows the active folder during keyboard navigation
 - Align horizontal scroll position in the folder pane to keep the active row visible
+- Align both vertical and horizontal scroll to keep the active folder fully visible
 
 ## Tests
 
